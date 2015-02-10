@@ -252,7 +252,72 @@ fi
 #
 ### ### ### ### ### ### ### ### ###
 
+LISTSNAPFILE1="/tmp/boot_btrfs_subvol_del1.txt"
+LISTSNAPFILE2="/tmp/boot_btrfs_subvol_del2.txt"
+LISTSNAPFILE3="/tmp/boot_btrfs_subvol_del3.txt"
 
+#/ btrfs subvolume list '/' | grep "ROOT/system-" | awk '{print $9}' | sed 's/ROOT//g' | sed 's/^.//' > $LISTSNAPFILE1
+
+btrfs subvolume list '/' | grep "ROOT/system-" | awk '{print $9}' > $LISTSNAPFILE1
+nl $LISTSNAPFILE1 | sed 's/ //g' > $LISTSNAPFILE2
+/bin/sed 's/$/ off/' $LISTSNAPFILE2 > $LISTSNAPFILE3
+
+#/ /bin/sed '0,/$/s/off/on/' $LISTSNAPFILE3 > $LISTSNAPFILE4
+#/ LISTSNAPFILE4="/tmp/boot_btrfs_subvol_del4.txt"
+
+LISTSNAPFILE5="/tmp/boot_btrfs_subvol_del5.txt"
+dialog --radiolist "Choose one subvolume to delete:" 60 60 60 --file "$LISTSNAPFILE3" 2>$LISTSNAPFILE5
+snapdel1=$?
+case $snapdel1 in
+   0)
+LISTSNAPFILE5CHECK=$(cat /tmp/boot_btrfs_subvol_del5.txt)
+if [ -z "$LISTSNAPFILE5CHECK" ]; then
+      /bin/echo "" # dummy
+      /bin/echo "" # dummy
+      /bin/echo "[Error] nothing selected"
+      exit 1
+fi
+LISTSNAPFILE6="/tmp/boot_btrfs_subvol_del6.txt"
+awk 'NR==FNR {h[$1] = $2; next} {print $1,$2,h[$1]}' "$LISTSNAPFILE3" "$LISTSNAPFILE5" | awk '{print $2}' | sed 's/"//g' > "$LISTSNAPFILE6"
+### ### ###
+#
+SNAPDEL=$(cat "$LISTSNAPFILE6" | sed 's/ROOT//g' | sed 's/^.//')
+SNAPDELFULL=$(cat "$LISTSNAPFILE6")
+#
+# grub restore
+cp -f /etc/grub.d/.40_custom_bk_pre_$SNAPDEL /etc/grub.d/40_custom
+#
+# grub update
+echo "" # dummy
+echo "" # dummy
+sleep 2
+grub-mkconfig
+echo "" # dummy
+sleep 2
+update-grub
+sleep 2
+#
+# subvolume snapshot delete
+echo "" # dummy
+btrfs subvolume delete /"$SNAPDELFULL"
+#
+# clean up
+rm -f /tmp/boot_btrfs_subvol_del*
+### ### ###
+;;
+   1)
+      /bin/echo "" # dummy
+      /bin/echo "" # dummy
+      #/ /bin/echo "ERROR:"
+      exit 0
+;;
+   255)
+      /bin/echo "" # dummy
+      /bin/echo "" # dummy
+      /bin/echo "[ESC] key pressed. (or no subvolume snapshots for deleting are available)"
+      exit 0
+;;
+esac
 
 ### ### ### ### ### ### ### ### ###
 #
