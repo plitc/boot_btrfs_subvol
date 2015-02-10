@@ -240,7 +240,7 @@ BTRFSVOL1=$(btrfs subvolume list '/' | grep -c "level")
 if [ "$BTRFSVOL1" -ge "1" ]; then
    : # dummy
 else
-   echo "[Error] won't create new subvolume snapshots inside other subvolume snapshots"
+   echo "[Error] won't delete the current subvolume snapshot inside another one"
    exit 1
 fi
 ## check default subvolume 2
@@ -248,7 +248,7 @@ BTRFSVOL2=$(btrfs subvolume show / | awk '{print $4}')
 if [ "$BTRFSVOL2" = "root" ]; then
    : # dummy
 else
-   echo "[Error] won't create new subvolume snapshots inside other subvolume snapshots"
+   echo "[Error] won't delete the current subvolume snapshot inside another one"
    exit 1
 fi
 ## check ROOT subvolume
