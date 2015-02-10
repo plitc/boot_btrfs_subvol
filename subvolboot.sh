@@ -44,6 +44,7 @@ case $DEBIAN in
 debian)
 ### stage2 // ###
 
+DATE=$(date +%Y-%m-%d-%H:%M)
 DIALOG=$(/usr/bin/which dialog)
 
 ### // stage2 ###
@@ -58,7 +59,7 @@ else
    exit 1
 fi
 if [ "$DEBVERSION" = "8" ]; then
-   echo "" # dummy
+   : # dummy
 else
    echo "<--- --- --->"
    echo ""
@@ -76,7 +77,34 @@ if [ -z "$DIALOG" ]; then
 fi
 #
 ### stage4 // ###
+#
+## check btrfs rootfilesystem
+BTRFSROOT=$(mount | grep "on / type" | awk '{print $5}')
+if [ "$BTRFSROOT" = "btrfs" ]; then
+   : # dummy
+else
+   echo "ERROR: can't find btrfs rootfilesystem"
+   exit 1
+fi
+## check default subvolume
+BTRFSVOL=$(btrfs subvolume list '/' | grep -c "level")
+if [ "$BTRFSVOL" -ge "1" ]; then
+   : # dummy
+else
+   echo "ERROR: won't create new subvolume snapshots inside other subvolume snapshots"
+   exit 1
+fi
+## check ROOT subvolume
+BTRFSSUBVOL=$(btrfs subvolume list '/ROOT' | grep -c "ROOT")
+if [ "$BTRFSSUBVOL" = "1" ]; then
+   : # dummy
+else
+   echo "create ROOT subvolume"
+   btrfs subvolume create /ROOT
+fi
 
+
+#
 ### // stage4 ###
 #
 ### // stage3 ###
@@ -95,6 +123,7 @@ esac
 ### // stage1 ###
 ;;
 *)
+echo ""
 echo "WARNING: subvolboot is highly experimental and its not ready for production. Do it at your own risk."
 echo ""
 echo "usage: $0 { create }"
