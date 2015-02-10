@@ -109,7 +109,7 @@ fi
 btrfs subvolume snapshot / /ROOT/system-"$DATE"
 if [ "$?" != "0" ]; then
    echo "" # dummy
-   echo "[Error] subvolume exists!" 1>&2
+   echo "[Error] subvolume snapshot exists!" 1>&2
    exit 1
 fi
 #
@@ -117,6 +117,7 @@ fi
 #/ grep "system" /ROOT/system-"$DATE"/etc/fstab | grep "btrfs" | sed 's/defaults/defaults,subvol=ROOT/system-"$DATE"/' > /ROOT/system-"$DATE"/etc/fstab_mod1
 sed -i '/-system/s/defaults/defaults,subvol=ROOT\/system-'$DATE'/' /ROOT/system-"$DATE"/etc/fstab
 #
+## modify grub
 
 
 #
