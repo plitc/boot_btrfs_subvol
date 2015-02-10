@@ -133,6 +133,8 @@ cp -f /etc/grub.d/40_custom /ROOT/system-"$DATE"/etc/grub.d/40_custom
 echo "" # dummy
 sleep 2
 grub-mkconfig
+echo "" # dummy
+sleep 2
 update-grub
 if [ "$?" != "0" ]; then
    echo "" # dummy
@@ -141,6 +143,8 @@ if [ "$?" != "0" ]; then
    echo "" # dummy
    sleep 2
    grub-mkconfig
+   echo "" # dummy
+   sleep 2
    update-grub
    exit 1
 fi
