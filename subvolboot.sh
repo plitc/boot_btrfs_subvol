@@ -55,7 +55,7 @@ if [ "$MYNAME" = "root" ]; then
 else
    echo "<--- --- --->"
    echo ""
-   echo "ERROR: You must be root to run this script"
+   echo "[Error] You must be root to run this script"
    exit 1
 fi
 if [ "$DEBVERSION" = "8" ]; then
@@ -63,7 +63,7 @@ if [ "$DEBVERSION" = "8" ]; then
 else
    echo "<--- --- --->"
    echo ""
-   echo "ERROR: You need Debian 8 (Jessie) Version"
+   echo "[Error] You need Debian 8 (Jessie) Version"
    exit 1
 fi
 
@@ -83,7 +83,7 @@ BTRFSROOT=$(mount | grep "on / type" | awk '{print $5}')
 if [ "$BTRFSROOT" = "btrfs" ]; then
    : # dummy
 else
-   echo "ERROR: can't find btrfs rootfilesystem"
+   echo "[Error] can't find btrfs rootfilesystem"
    exit 1
 fi
 ## check default subvolume
@@ -91,7 +91,7 @@ BTRFSVOL=$(btrfs subvolume list '/' | grep -c "level")
 if [ "$BTRFSVOL" -ge "1" ]; then
    : # dummy
 else
-   echo "ERROR: won't create new subvolume snapshots inside other subvolume snapshots"
+   echo "[Error] won't create new subvolume snapshots inside other subvolume snapshots"
    exit 1
 fi
 ## check ROOT subvolume
@@ -107,10 +107,16 @@ fi
 #
 ## create subvolume snapshot
 btrfs subvolume snapshot / /ROOT/system-"$DATE"
+if [ "$?" != "0" ]; then
+   echo "" # dummy
+   echo "[Error] subvolume exists!" 1>&2
+   exit 1
+fi
 #
 ## modify subvol fstab (require lvm "-system" name)
 #/ grep "system" /ROOT/system-"$DATE"/etc/fstab | grep "btrfs" | sed 's/defaults/defaults,subvol=ROOT/system-"$DATE"/' > /ROOT/system-"$DATE"/etc/fstab_mod1
 sed -i '/-system/s/defaults/defaults,subvol=ROOT\/system-'$DATE'/' /ROOT/system-"$DATE"/etc/fstab
+#
 
 
 #
@@ -126,7 +132,7 @@ sed -i '/-system/s/defaults/defaults,subvol=ROOT\/system-'$DATE'/' /ROOT/system-
    # error 1
    echo "<--- --- --->"
    echo ""
-   echo "ERROR: Plattform = unknown"
+   echo "[Error] Plattform = unknown"
    exit 1
    ;;
 esac
