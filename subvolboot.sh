@@ -177,11 +177,107 @@ esac
 #
 ### // stage1 ###
 ;;
+'delete')
+### stage1 // ###
+case $DEBIAN in
+debian)
+### stage2 // ###
+
+DATE=$(date +%Y%m%d-%H%M)
+DIALOG=$(/usr/bin/which dialog)
+
+### // stage2 ###
+#
+### stage3 // ###
+if [ "$MYNAME" = "root" ]; then
+   echo "<--- --- --->"
+else
+   echo "<--- --- --->"
+   echo ""
+   echo "[Error] You must be root to run this script"
+   exit 1
+fi
+if [ "$DEBVERSION" = "8" ]; then
+   : # dummy
+else
+   echo "<--- --- --->"
+   echo ""
+   echo "[Error] You need Debian 8 (Jessie) Version"
+   exit 1
+fi
+
+if [ -z "$DIALOG" ]; then
+   echo "<--- --- --->"
+   echo "need dialog"
+   echo "<--- --- --->"
+   apt-get update
+   apt-get install dialog
+   echo "<--- --- --->"
+fi
+#
+### stage4 // ###
+#
+## check btrfs rootfilesystem
+BTRFSROOT=$(mount | grep "on / type" | awk '{print $5}')
+if [ "$BTRFSROOT" = "btrfs" ]; then
+   : # dummy
+else
+   echo "[Error] can't find btrfs rootfilesystem"
+   exit 1
+fi
+## check default subvolume
+BTRFSVOL1=$(btrfs subvolume list '/' | grep -c "level")
+if [ "$BTRFSVOL1" -ge "1" ]; then
+   : # dummy
+else
+   echo "[Error] won't create new subvolume snapshots inside other subvolume snapshots"
+   exit 1
+fi
+## check default subvolume 2
+BTRFSVOL2=$(btrfs subvolume show / | awk '{print $4}')
+if [ "$BTRFSVOL2" = "root" ]; then
+   : # dummy
+else
+   echo "[Error] won't create new subvolume snapshots inside other subvolume snapshots"
+   exit 1
+fi
+## check ROOT subvolume
+BTRFSSUBVOL=$(btrfs subvolume list '/ROOT' | grep -c "ROOT")
+if [ "$BTRFSSUBVOL" = "1" ]; then
+   : # dummy
+else
+   echo "create ROOT subvolume"
+   btrfs subvolume create /ROOT
+fi
+#
+### ### ### ### ### ### ### ### ###
+
+
+
+### ### ### ### ### ### ### ### ###
+#
+### // stage4 ###
+#
+### // stage3 ###
+#
+### // stage2 ###
+   ;;
+*)
+   # error 1
+   echo "<--- --- --->"
+   echo ""
+   echo "[Error] Plattform = unknown"
+   exit 1
+   ;;
+esac
+#
+### // stage1 ###
+;;
 *)
 echo ""
 echo "WARNING: subvolboot is highly experimental and its not ready for production. Do it at your own risk."
 echo ""
-echo "usage: $0 { create }"
+echo "usage: $0 { create | delete }"
 ;;
 esac
 exit 0
