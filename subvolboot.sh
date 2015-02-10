@@ -44,7 +44,7 @@ case $DEBIAN in
 debian)
 ### stage2 // ###
 
-DATE=$(date +%Y-%m-%d-%H%M)
+DATE=$(date +%Y%m%d-%H%M)
 DIALOG=$(/usr/bin/which dialog)
 
 ### // stage2 ###
@@ -124,6 +124,7 @@ cat /boot/grub/grub.cfg | awk "/menuentry 'Debian GNU\/Linux'/,/}/" > /etc/grub.
 sed -i '/menuentry/s/Linux/Linux -- snapshot '$DATE'/' /etc/grub.d/.40_custom_mod1_system-"$DATE"
 sed -i '/-system/s/-system/-system rootflags=subvol=ROOT\/system-'$DATE'/' /etc/grub.d/.40_custom_mod1_system-"$DATE"
 sed -i '1i\### -- snapshot '$DATE'' /etc/grub.d/.40_custom_mod1_system-"$DATE"
+sed -i 's/quiet//g' /etc/grub.d/.40_custom_mod1_system-"$DATE"
 #
 ### (merge grub)
 cat /etc/grub.d/.40_custom_mod1_system-"$DATE" >> /etc/grub.d/40_custom
