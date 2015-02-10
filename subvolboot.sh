@@ -134,7 +134,7 @@ sed -i '/-system/s/defaults/defaults,subvol=ROOT\/system-'$DATE'/' /ROOT/system-
 #
 ## modify grub
 cp /etc/grub.d/40_custom /etc/grub.d/.40_custom_bk_pre_system-"$DATE"
-cat /boot/grub/grub.cfg | awk "/menuentry 'Debian GNU\/Linux'/,/}/" > /etc/grub.d/.40_custom_mod1_system-"$DATE"
+awk "/menuentry 'Debian GNU\/Linux'/,/}/" /boot/grub/grub.cfg > /etc/grub.d/.40_custom_mod1_system-"$DATE"
 #
 sed -i '/menuentry/s/Linux/Linux -- snapshot '$DATE' -- '$SNAPDESC3'/' /etc/grub.d/.40_custom_mod1_system-"$DATE"
 sed -i '/-system/s/-system/-system rootflags=subvol=ROOT\/system-'$DATE'/' /etc/grub.d/.40_custom_mod1_system-"$DATE"
@@ -291,11 +291,11 @@ LISTSNAPFILE6="/tmp/boot_btrfs_subvol_del6.txt"
 awk 'NR==FNR {h[$1] = $2; next} {print $1,$2,h[$1]}' "$LISTSNAPFILE3" "$LISTSNAPFILE5" | awk '{print $2}' | sed 's/"//g' > "$LISTSNAPFILE6"
 ### ### ###
 #
-SNAPDEL=$(cat "$LISTSNAPFILE6" | sed 's/ROOT//g' | sed 's/^.//')
+SNAPDEL=$(sed 's/ROOT//g' "$LISTSNAPFILE6" | sed 's/^.//')
 SNAPDELFULL=$(cat "$LISTSNAPFILE6")
 #
 # grub restore
-cp -f /etc/grub.d/.40_custom_bk_pre_$SNAPDEL /etc/grub.d/40_custom
+cp -f /etc/grub.d/.40_custom_bk_pre_"$SNAPDEL" /etc/grub.d/40_custom
 #
 # grub update
 echo "" # dummy
