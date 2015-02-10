@@ -22,7 +22,7 @@ Usage
 ```
     WARNING: subvolboot is highly experimental and its not ready for production. Do it at your own risk.
 
-    # usage: ./subvolboot.sh { create }
+    # usage: ./subvolboot.sh { create | delete }
 ```
 
 Errata
