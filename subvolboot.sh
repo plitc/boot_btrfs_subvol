@@ -276,7 +276,7 @@ nl $LISTSNAPFILE1 | sed 's/ //g' > $LISTSNAPFILE2
 #/ LISTSNAPFILE4="/tmp/boot_btrfs_subvol_del4.txt"
 
 LISTSNAPFILE5="/tmp/boot_btrfs_subvol_del5.txt"
-dialog --radiolist "Choose one subvolume to delete:" 60 60 60 --file "$LISTSNAPFILE3" 2>$LISTSNAPFILE5
+dialog --radiolist "Choose one subvolume to delete:" 45 45 45 --file "$LISTSNAPFILE3" 2>$LISTSNAPFILE5
 snapdel1=$?
 case $snapdel1 in
    0)
