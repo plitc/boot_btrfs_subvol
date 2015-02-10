@@ -127,16 +127,19 @@ sed -i '1i\### -- snapshot '$DATE'' /etc/grub.d/.40_custom_mod1_system-"$DATE"
 #
 ### (merge grub)
 cat /etc/grub.d/.40_custom_mod1_system-"$DATE" >> /etc/grub.d/40_custom
-cp -f /etc/grub.d/.40_custom /ROOT/system-"$DATE"/etc/grub.d/40_custom
+cp -f /etc/grub.d/40_custom /ROOT/system-"$DATE"/etc/grub.d/40_custom
 #
 ### grub update
+echo "" # dummy
+sleep 2
 grub-mkconfig
 update-grub
 if [ "$?" != "0" ]; then
    echo "" # dummy
    echo "[Error] something goes wrong let's restore the old configuration!" 1>&2
-   sleep 2
    cp -f /etc/grub.d/.40_custom_bk_pre_system-"$DATE" cp /etc/grub.d/40_custom
+   echo "" # dummy
+   sleep 2
    grub-mkconfig
    update-grub
    exit 1
