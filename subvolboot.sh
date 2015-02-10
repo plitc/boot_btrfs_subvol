@@ -44,7 +44,7 @@ case $DEBIAN in
 debian)
 ### stage2 // ###
 
-DATE=$(date +%Y-%m-%d-%H:%M)
+DATE=$(date +%Y-%m-%d-%H%M)
 DIALOG=$(/usr/bin/which dialog)
 
 ### // stage2 ###
