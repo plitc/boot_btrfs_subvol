@@ -314,7 +314,7 @@ rm -f /tmp/boot_btrfs_subvol_del*
    255)
       /bin/echo "" # dummy
       /bin/echo "" # dummy
-      /bin/echo "[ESC] key pressed. (or no subvolume snapshots for deleting are available)"
+      /bin/echo "[ESC] key pressed.   (or no subvolume snapshots for deleting are available)"
       exit 0
 ;;
 esac
