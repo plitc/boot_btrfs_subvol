@@ -118,8 +118,29 @@ fi
 sed -i '/-system/s/defaults/defaults,subvol=ROOT\/system-'$DATE'/' /ROOT/system-"$DATE"/etc/fstab
 #
 ## modify grub
-
-
+cp /etc/grub.d/40_custom /etc/grub.d/40_custom_bk_pre_system-"$DATE"
+cat /boot/grub/grub.cfg | awk "/menuentry 'Debian GNU\/Linux'/,/}/" > /etc/grub.d/40_custom_mod1_system-"$DATE"
+#
+sed -i '/menuentry/s/Linux/Linux -- snapshot '$DATE'/' /etc/grub.d/40_custom_mod1_system-"$DATE"
+sed -i '/-system/s/ro/ro rootflags=subvol=ROOT\/system-'$DATE'/' /etc/grub.d/40_custom_mod1_system-"$DATE"
+sed -i '1i\### -- snapshot '$DATE'' /etc/grub.d/40_custom_mod1_system-"$DATE"
+#
+### (merge grub)
+cat /etc/grub.d/40_custom_mod1_system-"$DATE" >> /etc/grub.d/40_custom
+cp -f /etc/grub.d/40_custom /ROOT/system-"$DATE"/etc/grub.d/40_custom
+#
+### grub update
+grub-mkconfig
+update-grub
+if [ "$?" != "0" ]; then
+   echo "" # dummy
+   echo "[Error] something goes wrong let's restore the old configuration!" 1>&2
+   sleep 2
+   cp -f /etc/grub.d/40_custom_bk_pre_system-"$DATE" cp /etc/grub.d/40_custom
+   grub-mkconfig
+   update-grub
+   exit 1
+fi
 #
 ### ### ### ### ### ### ### ### ###
 #
