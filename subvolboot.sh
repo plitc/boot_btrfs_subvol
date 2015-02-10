@@ -102,8 +102,19 @@ else
    echo "create ROOT subvolume"
    btrfs subvolume create /ROOT
 fi
+#
+### ### ### ### ### ### ### ### ###
+#
+## create subvolume snapshot
+btrfs subvolume snapshot / /ROOT/system-"$DATE"
+#
+## modify subvol fstab (require lvm "-system" name)
+#/ grep "system" /ROOT/system-"$DATE"/etc/fstab | grep "btrfs" | sed 's/defaults/defaults,subvol=ROOT/system-"$DATE"/' > /ROOT/system-"$DATE"/etc/fstab_mod1
+sed -i '/-system/s/defaults/defaults,subvol=ROOT\/system-'$DATE'/' /ROOT/system-"$DATE"/etc/fstab
 
 
+#
+### ### ### ### ### ### ### ### ###
 #
 ### // stage4 ###
 #
