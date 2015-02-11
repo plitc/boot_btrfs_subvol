@@ -30,7 +30,7 @@ Errata
 
 Diagram
 =======
-![plitc_debian8_luks_lvm_boot_btrfs_subvol](/plitc_debian8_luks_lvm_boot_btrfs_subvol.jpg)
+![plitc_debian8_luks_lvm_boot_btrfs_subvol](/content/plitc_debian8_luks_lvm_boot_btrfs_subvol.jpg)
 
 Screencast
 ==========
