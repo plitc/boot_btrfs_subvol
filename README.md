@@ -6,8 +6,9 @@ create very simple and fast btrfs subvolume snapshot boot environments
 Dependencies
 ============
 * Linux (Debian)
+   * machine with btrfs
+   * need lvm (logical volume) name "-system"
    * dialog
-   * need lvm name "-system"
 
 Features
 ========
