@@ -26,9 +26,6 @@ Usage
     # usage: ./subvolboot.sh { create | delete }
 ```
 
-Errata
-======
-
 Diagram
 =======
 ![plitc_debian8_luks_lvm_boot_btrfs_subvol](/content/plitc_debian8_luks_lvm_boot_btrfs_subvol.jpg)
@@ -36,4 +33,8 @@ Diagram
 Screencast
 ==========
 [![plitc deb8 btrfs luks lvm setup](https://img.youtube.com/vi/uRvd0H_m7pY/0.jpg)](https://www.youtube.com/watch?v=uRvd0H_m7pY)
+
+Errata
+======
+* 11.02.2015 - parsing error after minute swap
 
