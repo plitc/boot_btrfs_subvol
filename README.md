@@ -21,7 +21,7 @@ Platform
 Usage
 =====
 ```
-    WARNING: subvolboot is highly experimental and its not ready for production. Do it at your own risk.
+    WARNING: subvolboot is experimental and its not ready for production. Do it at your own risk.
 
     # usage: ./subvolboot.sh { create | delete }
 ```
