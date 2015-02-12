@@ -28,7 +28,7 @@
 #
 ### // LICENSE ###
 
-### ### ### PLITC ### ### ###
+### ### ### PLITC // ### ### ###
 
 
 ### stage0 // ###
@@ -357,5 +357,5 @@ echo "usage: $0 { create | delete }"
 esac
 exit 0
 
-### ### ### PLITC ### ### ###
+### ### ### // PLITC ### ### ###
 # EOF
