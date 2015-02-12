@@ -44,7 +44,8 @@ case $DEBIAN in
 debian)
 ### stage2 // ###
 
-DATE=$(date +%Y%m%d-%H%M)
+date +%Y%m%d-%H%M > /tmp/boot_btrfs_subvol_date.txt
+DATE=$(cat /tmp/boot_btrfs_subvol_date.txt)
 DIALOG=$(/usr/bin/which dialog)
 
 ### // stage2 ###
@@ -126,18 +127,21 @@ SNAPDESC1="/tmp/boot_btrfs_subvol_desc1.txt"
 SNAPDESC2="/tmp/boot_btrfs_subvol_desc2.txt"
 /bin/echo "test" > "$SNAPDESC1"
 dialog --title "Snapshot Description" --backtitle "Snapshot Description" --inputbox "Enter a short snapshot description: (for example: test)" 8 60 "$(cat $SNAPDESC1)" 2>$SNAPDESC2
+snapdesc1=$?
+case $snapdesc1 in
+   0)
 SNAPDESC3=$(sed 's/#//g' "$SNAPDESC2" | sed 's/%//g' | sed 's/ //g')
 #
-## modify subvol fstab (require lvm "-system" name)
-#/ grep "system" /ROOT/system-"$DATE"/etc/fstab | grep "btrfs" | sed 's/defaults/defaults,subvol=ROOT/system-"$DATE"/' > /ROOT/system-"$DATE"/etc/fstab_mod1
-sed -i '/-system/s/defaults/defaults,subvol=ROOT\/system-'$DATE'/' /ROOT/system-"$DATE"/etc/fstab
+## modify subvol fstab
+sed -i '/\/ *btrfs/s/defaults/defaults,subvol=ROOT\/system-'$DATE'/' /ROOT/system-"$DATE"/etc/fstab
 #
 ## modify grub
 cp /etc/grub.d/40_custom /etc/grub.d/.40_custom_bk_pre_system-"$DATE"
 awk "/menuentry 'Debian GNU\/Linux'/,/}/" /boot/grub/grub.cfg > /etc/grub.d/.40_custom_mod1_system-"$DATE"
 #
 sed -i '/menuentry/s/Linux/Linux -- snapshot '$DATE' -- '$SNAPDESC3'/' /etc/grub.d/.40_custom_mod1_system-"$DATE"
-sed -i '/-system/s/-system/-system rootflags=subvol=ROOT\/system-'$DATE'/' /etc/grub.d/.40_custom_mod1_system-"$DATE"
+#
+sed -i '/vmlinuz/s/$/ rootflags=subvol=ROOT\/system-'$DATE'/' /etc/grub.d/.40_custom_mod1_system-"$DATE"
 sed -i '1i\### -- snapshot '$DATE'' /etc/grub.d/.40_custom_mod1_system-"$DATE"
 sed -i 's/quiet//g' /etc/grub.d/.40_custom_mod1_system-"$DATE"
 #
@@ -164,6 +168,26 @@ if [ "$?" != "0" ]; then
    update-grub
    exit 1
 fi
+#
+;;
+   1)
+      /bin/echo "" # dummy
+      /bin/echo "" # dummy
+      btrfs subvolume delete /ROOT/system-"$DATE"
+      /bin/echo "" # dummy
+      /bin/echo "[Error] abort."
+      #/ /bin/echo "ERROR:"
+      exit 0
+;;
+   255)
+      /bin/echo "" # dummy
+      /bin/echo "" # dummy
+      btrfs subvolume delete /ROOT/system-"$DATE"
+      /bin/echo "" # dummy
+      /bin/echo "[ESC] key pressed."
+      exit 0
+;;
+esac
 #
 # clean up
 rm -f /tmp/boot_btrfs_subvol_desc*
@@ -193,7 +217,6 @@ case $DEBIAN in
 debian)
 ### stage2 // ###
 
-DATE=$(date +%Y%m%d-%H%M)
 DIALOG=$(/usr/bin/which dialog)
 
 ### // stage2 ###
@@ -266,14 +289,9 @@ LISTSNAPFILE1="/tmp/boot_btrfs_subvol_del1.txt"
 LISTSNAPFILE2="/tmp/boot_btrfs_subvol_del2.txt"
 LISTSNAPFILE3="/tmp/boot_btrfs_subvol_del3.txt"
 
-#/ btrfs subvolume list '/' | grep "ROOT/system-" | awk '{print $9}' | sed 's/ROOT//g' | sed 's/^.//' > $LISTSNAPFILE1
-
 btrfs subvolume list '/' | grep "ROOT/system-" | awk '{print $9}' > $LISTSNAPFILE1
 nl $LISTSNAPFILE1 | sed 's/ //g' > $LISTSNAPFILE2
 /bin/sed 's/$/ off/' $LISTSNAPFILE2 > $LISTSNAPFILE3
-
-#/ /bin/sed '0,/$/s/off/on/' $LISTSNAPFILE3 > $LISTSNAPFILE4
-#/ LISTSNAPFILE4="/tmp/boot_btrfs_subvol_del4.txt"
 
 LISTSNAPFILE5="/tmp/boot_btrfs_subvol_del5.txt"
 dialog --radiolist "Choose one subvolume to delete:" 45 45 45 --file "$LISTSNAPFILE3" 2>$LISTSNAPFILE5
